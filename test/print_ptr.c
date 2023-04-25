@@ -51,6 +51,8 @@ int print_ptr(va_list types, char buffer[],
 		width, flags, padd, extra_c, padd_start));
 }
 
+
+
 /**
  * print_non_print - Prints ascii codes in hexa of non printable chars
  * @types: Lista of arguments
