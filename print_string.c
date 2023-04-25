@@ -1,44 +1,56 @@
 #include "main.h"
 
 /**
- * print_str - Prints a string
- * @c: char types.
+ * print_string - Prints a string
+ * @types: List a of arguments
  * @buffer: Buffer array to handle print
- * @flags:  Calculates active flags.
+ * @flags:  Calculates active flags
  * @width: get width.
- * @precision: precision specifier
+ * @precision: Precision specification
  * @size: Size specifier
- *
- * Return: Number of chars printed.
+ * Return: Number of chars printed
  */
-int print_str(char c, char buffer[],
+int print_string(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
-{ /* char is stored at left and paddind at buffer's right */
-	int i = 0;
-	char padd = ' ';
+{
+	int length = 0, i;
+	char *str = va_arg(types, char *);
 
+	UNUSED(buffer);
+	UNUSED(flags);
+	UNUSED(width);
 	UNUSED(precision);
 	UNUSED(size);
-
-	if (flags & F_ZERO)
-		padd = '0';
-
-	buffer[i++] = c;
-	buffer[i] = '\0';
-
-	if (width > 1)
+	if (str == NULL)
 	{
-		buffer[BUFF_SIZE - 1] = '\0';
-		for (i = 0; i < width - 1; i++)
-			buffer[BUFF_SIZE - i - 2] = padd;
-
-		if (flags & F_MINUS)
-			return (write(1, &buffer[0], 1) +
-					write(1, &buffer[BUFF_SIZE - i - 1], width - 1));
-		else
-			return (write(1, &buffer[BUFF_SIZE - i - 1], width - 1) +
-					write(1, &buffer[0], 1));
+		str = "(null)";
+		if (precision >= 6)
+			str = "      ";
 	}
 
-	return (write(1, &buffer[0], 1));
+	while (str[length] != '\0')
+		length++;
+
+	if (precision >= 0 && precision < length)
+		length = precision;
+
+	if (width > length)
+	{
+		if (flags & F_MINUS)
+		{
+			write(1, &str[0], length);
+			for (i = width - length; i > 0; i--)
+				write(1, " ", 1);
+			return (width);
+		}
+		else
+		{
+			for (i = width - length; i > 0; i--)
+				write(1, " ", 1);
+			write(1, &str[0], length);
+			return (width);
+		}
+	}
+
+	return (write(1, str, length));
 }
